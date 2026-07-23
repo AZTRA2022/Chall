@@ -1,50 +1,67 @@
-# Welcome to your Expo app 👋
+# Chall
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Self-challenging & world-challenging tracker (e.g. bench press rep contests) with real-time on-device movement recognition and counting.
 
-## Get started
+## Stack
 
-1. Install dependencies
+- **React Native + Expo (SDK 54)** — Expo Router, file-based routing
+- **NativeWind v4 + Tailwind v3** — styling
+- **Convex** — realtime backend (challenges, leaderboards, sync)
+- **react-native-vision-camera** — camera frame processors
+- **react-native-fast-tflite** — on-device pose model inference (rep detection/counting)
 
-   ```bash
-   npm install
-   ```
+Native modules (vision-camera, fast-tflite) require a custom **dev client** — this app cannot run in Expo Go.
 
-2. Start the app
+## Project structure
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+src/
+  app/          # Expo Router routes only — every file is a route
+  screens/      # screen bodies rendered by routes (created as needed)
+  components/   # reusable UI (kebab-case, one per file)
+  services/     # domain logic (pose detection, rep-counting) — created as needed
+  lib/          # Convex client, shared utilities — created as needed
+  hooks/        # reusable hooks
+  constants/    # theme, app-wide constants
+convex/         # Convex backend functions (created by `npx convex dev`)
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+`app/` files must stay routes-only; screen UI and business logic live outside it. See `@/*` alias → `src/*` in `tsconfig.json`.
 
-## Learn more
+## Getting started
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+corepack enable pnpm   # if pnpm isn't on PATH
+pnpm install
+npx expo prebuild      # generates ios/ and android/ (gitignored)
+npx expo run:ios       # or run:android — builds the dev client
+pnpm start             # subsequent runs
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Convex
 
-## Join the community
+Not yet linked to a deployment. Run once, interactively:
 
-Join our community of developers creating universal apps.
+```bash
+npx convex dev
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+This logs in, creates the deployment, and scaffolds `convex/` with generated types.
+
+## Scripts
+
+| Script                         | Purpose              |
+| ------------------------------ | -------------------- |
+| `pnpm start`                   | Start Metro          |
+| `pnpm ios` / `android` / `web` | Start on a platform  |
+| `pnpm lint`                    | ESLint (`expo lint`) |
+| `pnpm typecheck`               | `tsc --noEmit`       |
+| `pnpm format`                  | Prettier write       |
+
+## Git workflow
+
+- **Commits**: [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`, …), enforced by commitlint on `commit-msg`.
+- **Pre-commit**: husky + lint-staged run ESLint and Prettier on staged files.
+- Native folders (`ios/`, `android/`) are never committed — always regenerated via `expo prebuild`.
+
+CLERK_FRONTEND_API_URL=https://splendid-flounder-11.clerk.accounts.dev

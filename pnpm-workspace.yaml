@@ -1,2 +1,12 @@
+nodeLinker: hoisted
+
 allowBuilds:
-  unrs-resolver: set this to true or false
+  dtrace-provider: true
+  esbuild: true
+  unrs-resolver: false
+
+minimumReleaseAgeExclude:
+  - '@expo/eas-build-job@21.1.0'
+  - '@expo/eas-json@21.1.0'
+  - '@expo/steps@21.1.0'
+  - eas-cli@21.1.0
