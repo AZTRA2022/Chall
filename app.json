@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "Chall needs camera access to detect and count your movements in real time."
-      }
+      },
+      "bundleIdentifier": "com.konanisaac.Chall"
     },
     "android": {
       "adaptiveIcon": {
@@ -49,7 +50,12 @@
       ],
       "react-native-fast-tflite",
       "expo-font",
-      "expo-secure-store"
+      "expo-secure-store",
+      "@clerk/expo",
+      "expo-image-picker",
+      "expo-notifications",
+      "expo-media-library",
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true,

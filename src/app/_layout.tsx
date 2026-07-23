@@ -1,3 +1,5 @@
+import { ClerkProvider, useAuth } from "@clerk/expo";
+import { tokenCache } from "@clerk/expo/token-cache";
 import { BebasNeue_400Regular } from "@expo-google-fonts/bebas-neue";
 import {
   Inter_400Regular,
@@ -14,8 +16,8 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
-import { ConvexProvider, useConvexAuth } from "convex/react";
+import { useConvexAuth } from "convex/react";
+import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -25,10 +27,14 @@ import "react-native-reanimated";
 import "../global.css";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { authClient } from "@/lib/auth-client";
 import { convex } from "@/lib/convex";
 
 SplashScreen.preventAutoHideAsync();
+
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+if (!publishableKey) {
+  throw new Error("Add EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY to your .env.local");
+}
 
 function RootNavigator() {
   const colorScheme = useColorScheme();
@@ -75,10 +81,10 @@ export default function RootLayout() {
   }
 
   return (
-    <ConvexProvider client={convex}>
-      <ConvexBetterAuthProvider client={convex} authClient={authClient}>
+    <ClerkProvider publishableKey={publishableKey!} tokenCache={tokenCache}>
+      <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
         <RootNavigator />
-      </ConvexBetterAuthProvider>
-    </ConvexProvider>
+      </ConvexProviderWithClerk>
+    </ClerkProvider>
   );
 }

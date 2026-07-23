@@ -1,12 +1,11 @@
+import { useSignIn, useSSO } from "@clerk/expo";
 import { Link, router } from "expo-router";
 import {
-  AppleLogo,
   CaretLeft,
-  Check,
   Envelope,
   Eye,
   EyeSlash,
-  FacebookLogo,
+  GithubLogo,
   GoogleLogo,
   Lock,
 } from "phosphor-react-native";
@@ -17,37 +16,63 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/text-field";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { authClient } from "@/lib/auth-client";
+import { fieldErrors, loginSchema } from "@/lib/validations/auth";
 
 export default function LoginScreen() {
   const mutedForeground = useThemeColor({}, "mutedForeground");
   const foreground = useThemeColor({}, "foreground");
-  const primaryForeground = useThemeColor({}, "primaryForeground");
+
+  const { signIn } = useSignIn();
+  const { startSSOFlow } = useSSO();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const canSubmit = email.trim().length > 0 && password.length > 0 && !loading;
 
-  const handleLogin = async () => {
-    if (!canSubmit) return;
+  const handleSocialLogin = async (strategy: "oauth_google" | "oauth_github") => {
     setError(null);
+    try {
+      const { createdSessionId, setActive } = await startSSOFlow({ strategy });
+      if (createdSessionId && setActive) {
+        await setActive({ session: createdSessionId });
+        router.replace("/(tabs)");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not sign in.");
+    }
+  };
+
+  const handleLogin = async () => {
+    if (!canSubmit || !signIn) return;
+    setError(null);
+    setErrors({});
+
+    const parsed = loginSchema.safeParse({ email: email.trim(), password });
+    if (!parsed.success) {
+      setErrors(fieldErrors(parsed.error));
+      return;
+    }
+
     setLoading(true);
-    const { error: signInError } = await authClient.signIn.email({
-      email: email.trim(),
-      password,
-      rememberMe,
+    const { error: signInError } = await signIn.password({
+      emailAddress: parsed.data.email,
+      password: parsed.data.password,
     });
-    setLoading(false);
     if (signInError) {
+      setLoading(false);
       setError(signInError.message ?? "Could not sign you in.");
       return;
     }
-    router.replace("/(tabs)");
+
+    if (signIn.status === "complete") {
+      await signIn.finalize({ navigate: () => router.replace("/(tabs)") });
+    }
+    setLoading(false);
   };
 
   return (
@@ -83,6 +108,11 @@ export default function LoginScreen() {
             onChangeText={setEmail}
             icon={<Envelope size={20} color={mutedForeground} />}
           />
+          {errors.email ? (
+            <Text className="font-sans text-sm text-destructive">
+              {errors.email}
+            </Text>
+          ) : null}
           <TextField
             placeholder="Password"
             secureTextEntry={!showPassword}
@@ -100,34 +130,22 @@ export default function LoginScreen() {
               </Pressable>
             }
           />
+          {errors.password ? (
+            <Text className="font-sans text-sm text-destructive">
+              {errors.password}
+            </Text>
+          ) : null}
           {error ? (
             <Text className="font-sans text-sm text-destructive">{error}</Text>
           ) : null}
         </View>
 
-        <View className="flex-row items-center justify-between">
-          <Pressable
-            onPress={() => setRememberMe((v) => !v)}
-            className="flex-row items-center gap-2"
-          >
-            <View
-              className={`h-5 w-5 items-center justify-center rounded-md border ${
-                rememberMe ? "border-primary bg-primary" : "border-border"
-              }`}
-            >
-              {rememberMe ? (
-                <Check size={14} color={primaryForeground} weight="bold" />
-              ) : null}
-            </View>
-            <Text className="font-sans text-sm text-muted-foreground">
-              Remember me
-            </Text>
-          </Pressable>
-          <Pressable>
+        <View className="flex-row items-center justify-end">
+          <Link href="/(auth)/forgot-password">
             <Text className="font-sans-medium text-sm text-primary">
               Forgot password?
             </Text>
-          </Pressable>
+          </Link>
         </View>
 
         <Button
@@ -146,9 +164,14 @@ export default function LoginScreen() {
         </View>
 
         <View className="flex-row justify-center gap-4">
-          <SocialButton icon={<GoogleLogo size={22} color={foreground} />} />
-          <SocialButton icon={<AppleLogo size={22} color={foreground} />} />
-          <SocialButton icon={<FacebookLogo size={22} color={foreground} />} />
+          <SocialButton
+            icon={<GoogleLogo size={22} color={foreground} />}
+            onPress={() => handleSocialLogin("oauth_google")}
+          />
+          <SocialButton
+            icon={<GithubLogo size={22} color={foreground} />}
+            onPress={() => handleSocialLogin("oauth_github")}
+          />
         </View>
 
         <View className="flex-row justify-center gap-1">
@@ -164,9 +187,18 @@ export default function LoginScreen() {
   );
 }
 
-function SocialButton({ icon }: { icon: ReactNode }) {
+function SocialButton({
+  icon,
+  onPress,
+}: {
+  icon: ReactNode;
+  onPress: () => void;
+}) {
   return (
-    <Pressable className="h-14 w-14 items-center justify-center rounded-full border border-border bg-muted active:opacity-80">
+    <Pressable
+      onPress={onPress}
+      className="h-14 w-14 items-center justify-center rounded-full border border-border bg-muted active:opacity-80"
+    >
       {icon}
     </Pressable>
   );

@@ -9,7 +9,12 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as disciplines from "../disciplines.js";
 import type * as http from "../http.js";
+import type * as movementCaptures from "../movementCaptures.js";
+import type * as records from "../records.js";
+import type * as sessions from "../sessions.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -19,7 +24,12 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  disciplines: typeof disciplines;
   http: typeof http;
+  movementCaptures: typeof movementCaptures;
+  records: typeof records;
+  sessions: typeof sessions;
+  users: typeof users;
 }>;
 
 /**
@@ -48,6 +58,4 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {
-  betterAuth: import("@convex-dev/better-auth/_generated/component.js").ComponentApi<"betterAuth">;
-};
+export declare const components: {};
