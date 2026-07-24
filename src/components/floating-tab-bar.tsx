@@ -1,10 +1,14 @@
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useThemeColor } from "@/hooks/use-theme-color";
 
-export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+export function FloatingTabBar({
+  state,
+  descriptors,
+  navigation,
+}: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const tabBar = useThemeColor({}, "tabBar");
   const tabChip = useThemeColor({}, "tabChip");
@@ -15,9 +19,12 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
   return (
     <View
       pointerEvents="box-none"
-      style={[styles.wrapper, { bottom: insets.bottom + 16 }]}
+      style={{ bottom: insets.bottom + 10 }}
+      className="absolute left-16 right-12  "
     >
-      <View style={[styles.bar, { backgroundColor: tabBar, borderColor: border }]}>
+      <View
+        style={[styles.bar, { backgroundColor: tabBar, borderColor: border }]}
+      >
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const focused = state.index === index;
@@ -56,6 +63,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
                 focused && { backgroundColor: tabChip },
                 pressed && { opacity: 0.6 },
               ]}
+              className={` flex items-center justify-center ${focused ? "" : ""}`}
             >
               {options.tabBarIcon?.({ focused, color, size: 22 })}
               <Text numberOfLines={1} style={[styles.label, { color }]}>
@@ -79,32 +87,26 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: "row",
     alignItems: "center",
-    maxWidth: "100%",
-    padding: 8,
+    justifyContent: "center",
+    maxWidth: "90%",
+    gap: 40,
+    padding: 12,
     borderRadius: 999,
     borderWidth: StyleSheet.hairlineWidth,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOpacity: 0.12,
-        shadowRadius: 20,
-        shadowOffset: { width: 0, height: 8 },
-      },
-      android: { elevation: 8 },
-      default: {},
-    }),
+    boxShadow: "0px 6px 28px rgba(0, 0, 0, 0.07)",
   },
   item: {
-    flexShrink: 1,
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
     gap: 3,
     paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 14,
+    paddingHorizontal: 10,
+    borderRadius: 999,
   },
   label: {
     fontSize: 11,
     fontWeight: "600",
+    textAlign: "center",
   },
 });

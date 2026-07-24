@@ -24,8 +24,8 @@ export const Colors = {
     primaryForeground: "#171717",
     // Floating tab bar
     tabBar: "#ffffff",
-    tabChip: "#fff0e6",
-    tabChipForeground: "#f97316",
+    tabChip: "#ffdcc7",
+    tabChipForeground: "#ea580c",
   },
   dark: {
     text: "#ECEDEE",
@@ -42,7 +42,7 @@ export const Colors = {
     primaryForeground: "#171717",
     // Floating tab bar
     tabBar: "#171717",
-    tabChip: "rgba(249, 115, 22, 0.15)",
+    tabChip: "rgba(249, 115, 22, 0.24)",
     tabChipForeground: "#fb923c",
   },
 };

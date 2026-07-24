@@ -1,5 +1,12 @@
 import { Tabs } from "expo-router";
-import { House, Trophy, User, VideoCamera } from "phosphor-react-native";
+import {
+  DotsNineIcon,
+  Gear,
+  House,
+  Trophy,
+  User,
+  VideoCamera,
+} from "phosphor-react-native";
 
 import { FloatingTabBar } from "@/components/floating-tab-bar";
 
@@ -15,30 +22,30 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color, size }) => <House size={size} color={color} weight="fill" />,
-        }}
-      />
-      <Tabs.Screen
-        name="record"
-        options={{
-          title: "Record",
           tabBarIcon: ({ color, size }) => (
-            <VideoCamera size={size} color={color} weight="fill" />
+            <House size={size} color={color} weight="fill" />
           ),
         }}
       />
       <Tabs.Screen
-        name="leaderboard"
+        name="explore"
+
         options={{
-          title: "Ranking",
-          tabBarIcon: ({ color, size }) => <Trophy size={size} color={color} weight="fill" />,
+          title: "Explore",
+
+          tabBarIcon: ({ color, size }) => (
+            <DotsNineIcon size={size} color={color} weight="fill" />
+          ),
         }}
       />
+
       <Tabs.Screen
-        name="profile"
+        name="settings"
         options={{
-          title: "Profile",
-          tabBarIcon: ({ color, size }) => <User size={size} color={color} weight="fill" />,
+          title: "Settings",
+          tabBarIcon: ({ color, size }) => (
+            <Gear size={size} color={color} weight="fill" />
+          ),
         }}
       />
     </Tabs>

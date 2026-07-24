@@ -17,10 +17,12 @@ import { useConvexAuth, useMutation } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { api } from "../../convex/_generated/api";
 import { useFonts } from "expo-font";
+import * as NavigationBar from "expo-navigation-bar";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { Platform } from "react-native";
 import "react-native-reanimated";
 import "../global.css";
 
@@ -45,6 +47,17 @@ function RootNavigator() {
   const colorScheme = useColorScheme();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const savePushToken = useMutation(api.users.savePushToken);
+
+  // Masque la barre de navigation système Android ; elle réapparaît le temps
+  // d'un swipe puis se recache, sans décaler le contenu.
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+    NavigationBar.setVisibilityAsync("hidden")
+      .then(() => NavigationBar.setBehaviorAsync("overlay-swipe"))
+      .catch((e) => {
+        console.warn("[ui] masquage de la barre de navigation échoué", e);
+      });
+  }, []);
 
   // Canaux Android dès le démarrage (aucun prompt).
   useEffect(() => {
