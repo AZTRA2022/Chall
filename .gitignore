@@ -42,3 +42,9 @@ app-example
 # generated native folders
 /ios
 /android
+
+# FCM push credentials — SENSITIVE service account key, never commit
+# (google-services.json is public and safe to commit)
+*service-account*.json
+fcm-*.json
+google-service-account*.json

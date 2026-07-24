@@ -11,13 +11,11 @@ import {
   JetBrainsMono_400Regular,
   JetBrainsMono_700Bold,
 } from "@expo-google-fonts/jetbrains-mono";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
-import { useConvexAuth } from "convex/react";
+import { ThemeProvider } from "@react-navigation/native";
+import { PortalHost } from "@rn-primitives/portal";
+import { useConvexAuth, useMutation } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
+import { api } from "../../convex/_generated/api";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -26,10 +24,17 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import "../global.css";
 
+import { LoadingScreen } from "@/components/loading-screen";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { convex } from "@/lib/convex";
+import {
+  registerForPushNotificationsAsync,
+  setupAndroidChannels,
+} from "@/lib/notifications";
+import { NAV_THEME } from "@/lib/theme";
 
 SplashScreen.preventAutoHideAsync();
+SplashScreen.setOptions({ duration: 300, fade: true });
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 if (!publishableKey) {
@@ -39,13 +44,36 @@ if (!publishableKey) {
 function RootNavigator() {
   const colorScheme = useColorScheme();
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const savePushToken = useMutation(api.users.savePushToken);
+
+  // Canaux Android dès le démarrage (aucun prompt).
+  useEffect(() => {
+    setupAndroidChannels().catch((e) => {
+      console.warn("[push] création des canaux Android échouée", e);
+    });
+  }, []);
+
+  // Enregistre le device + sauve le token push une fois connecté (prompt permission).
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    registerForPushNotificationsAsync()
+      .then((token) => {
+        // null = simulateur, permission refusée ou projectId manquant : déjà loggé.
+        if (token) return savePushToken({ token });
+      })
+      .catch((e) => {
+        console.warn("[push] enregistrement du device échoué", e);
+      });
+  }, [isAuthenticated, savePushToken]);
 
   if (isLoading) {
-    return null;
+    return <LoadingScreen />;
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <ThemeProvider
+      value={colorScheme === "dark" ? NAV_THEME.dark : NAV_THEME.light}
+    >
       <Stack>
         <Stack.Protected guard={!isAuthenticated}>
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
@@ -55,6 +83,7 @@ function RootNavigator() {
         </Stack.Protected>
       </Stack>
       <StatusBar style="auto" />
+      <PortalHost />
     </ThemeProvider>
   );
 }
@@ -77,7 +106,7 @@ export default function RootLayout() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) {
-    return null;
+    return <LoadingScreen />;
   }
 
   return (

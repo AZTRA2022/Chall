@@ -9,13 +9,12 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
-      "infoPlist": {
-        "NSCameraUsageDescription": "Chall needs camera access to detect and count your movements in real time."
-      },
+      "supportsTablet": false,
+
       "bundleIdentifier": "com.konanisaac.Chall"
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -24,10 +23,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.CAMERA"
-      ],
+      "permissions": ["android.permission.CAMERA"],
       "package": "com.konanisaac.Chall"
     },
     "web": {
@@ -39,11 +35,12 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/chall-mark-dark.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
           "dark": {
+            "image": "./assets/images/chall-mark-light.png",
             "backgroundColor": "#000000"
           }
         }
@@ -53,7 +50,21 @@
       "expo-secure-store",
       "@clerk/expo",
       "expo-image-picker",
-      "expo-notifications",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#A3E637",
+          "sounds": [
+            "./assets/sounds/notif_1.wav",
+            "./assets/sounds/notif_2.wav",
+            "./assets/sounds/notif_3.wav",
+            "./assets/sounds/succes_ot_notif.wav",
+            "./assets/sounds/money_cash.wav",
+            "./assets/sounds/error.wav"
+          ]
+        }
+      ],
       "expo-media-library",
       "expo-video"
     ],

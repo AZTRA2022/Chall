@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "773612070334",
+    "project_id": "chall-fe793",
+    "storage_bucket": "chall-fe793.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:773612070334:android:94b6fa136b938ce05a05ef",
+        "android_client_info": {
+          "package_name": "com.konanisaac.Chall"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6so2M94exkhBuuEKZ_79hR2qDRu6XCbg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

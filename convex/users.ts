@@ -83,6 +83,51 @@ export const setDataCollectionConsent = mutation({
   },
 });
 
+/**
+ * Enregistre le token push du device courant pour l'utilisateur connecté.
+ * Un token n'appartient qu'à un seul user : si le device était rattaché à un
+ * autre compte (deux comptes sur le même téléphone), il est réattribué.
+ */
+export const savePushToken = mutation({
+  args: { token: v.string() },
+  handler: async (ctx, { token }) => {
+    const user = await getAuthedUser(ctx);
+    if (!user) throw new Error("Not authenticated");
+
+    const now = Date.now();
+    const existing = await ctx.db
+      .query("pushTokens")
+      .withIndex("by_token", (q) => q.eq("token", token))
+      .unique();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, { userId: user._id, lastSeenAt: now });
+      return;
+    }
+
+    await ctx.db.insert("pushTokens", {
+      userId: user._id,
+      token,
+      createdAt: now,
+      lastSeenAt: now,
+    });
+  },
+});
+
+/** À appeler AVANT `signOut()` : après, la mutation n'est plus authentifiée. */
+export const removePushToken = mutation({
+  args: { token: v.string() },
+  handler: async (ctx, { token }) => {
+    const user = await getAuthedUser(ctx);
+    if (!user) return;
+    const doc = await ctx.db
+      .query("pushTokens")
+      .withIndex("by_token", (q) => q.eq("token", token))
+      .unique();
+    if (doc && doc.userId === user._id) await ctx.db.delete(doc._id);
+  },
+});
+
 export const generateAvatarUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
