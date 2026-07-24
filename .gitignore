@@ -48,3 +48,4 @@ app-example
 *service-account*.json
 fcm-*.json
 google-service-account*.json
+google-services*.json
