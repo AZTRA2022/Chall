@@ -3,24 +3,11 @@ import { v } from "convex/values";
 
 import { components, internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
-import { internalAction, internalMutation, internalQuery } from "../_generated/server";
-
-/**
- * Recopie progressive des fichiers Convex vers R2.
- *
- * Migration par lots plutôt qu'en une passe : une action a un temps
- * d'exécution borné, et une bascule massive qui échoue au milieu laisserait la
- * base dans un état à moitié migré sans savoir où reprendre. Ici chaque fichier
- * est indépendant — l'interruption ne coûte que le lot en cours.
- *
- * À lancer depuis le tableau de bord Convex une fois les variables R2_*
- * définies :
- *
- *     npx convex run storage/migrate:run '{"batchSize": 20}'
- *
- * Relancer autant de fois que nécessaire ; la fonction renvoie le nombre de
- * fichiers restants.
- */
+import {
+  internalAction,
+  internalMutation,
+  internalQuery,
+} from "../_generated/server";
 
 const r2 = new R2(components.r2);
 
@@ -31,7 +18,11 @@ export const listConvexFiles = internalQuery({
     return files
       .filter((f) => f.storageProvider === "convex" && f.storageId)
       .slice(0, batchSize)
-      .map((f) => ({ id: f._id, storageId: f.storageId!, mimeType: f.mimeType }));
+      .map((f) => ({
+        id: f._id,
+        storageId: f.storageId!,
+        mimeType: f.mimeType,
+      }));
   },
 });
 
@@ -55,20 +46,23 @@ export const markMigrated = internalMutation({
       storageId: undefined,
     });
 
-    // L'objet Convex n'est supprimé qu'après le basculement du document : dans
-    // l'ordre inverse, une panne entre les deux laisserait une ligne qui pointe
-    // vers un fichier disparu.
     if (file.storageId) await ctx.storage.delete(file.storageId);
   },
 });
 
 export const run = internalAction({
   args: { batchSize: v.optional(v.number()) },
-  handler: async (ctx, { batchSize }): Promise<{ migrated: number; remaining: number }> => {
-    const files: { id: Id<"files">; storageId: Id<"_storage">; mimeType: string }[] =
-      await ctx.runQuery(internal.storage.migrate.listConvexFiles, {
-        batchSize: batchSize ?? 20,
-      });
+  handler: async (
+    ctx,
+    { batchSize },
+  ): Promise<{ migrated: number; remaining: number }> => {
+    const files: {
+      id: Id<"files">;
+      storageId: Id<"_storage">;
+      mimeType: string;
+    }[] = await ctx.runQuery(internal.storage.migrate.listConvexFiles, {
+      batchSize: batchSize ?? 20,
+    });
 
     let migrated = 0;
     for (const file of files) {

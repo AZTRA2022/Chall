@@ -2,20 +2,7 @@ import { R2 } from "@convex-dev/r2";
 
 import { components } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
-import type {
-  ActionCtx,
-  MutationCtx,
-  QueryCtx,
-} from "../_generated/server";
-
-/**
- * Couche unique d'accès au stockage.
- *
- * Aucun autre fichier ne doit appeler `ctx.storage.*` ni le client R2
- * directement. C'est ce qui permet de changer de fournisseur sans toucher aux
- * appelants — et c'est aussi ce qui manquait quand les appels se sont
- * disséminés dans cinq modules.
- */
+import type { ActionCtx, MutationCtx, QueryCtx } from "../_generated/server";
 
 const r2 = new R2(components.r2);
 
@@ -25,14 +12,6 @@ export type StorageRef = Pick<
   "storageProvider" | "storageId" | "storageKey"
 >;
 
-/**
- * Fournisseur utilisé pour les **nouveaux** envois.
- *
- * Déduit de la présence des variables d'environnement plutôt que d'un drapeau
- * séparé : un drapeau à `r2` sans identifiants produirait des envois qui
- * échouent, alors qu'ici l'absence de configuration retombe simplement sur
- * Convex. Les objets déjà stockés gardent leur fournisseur d'origine.
- */
 export function activeProvider(): "convex" | "r2" {
   const configured =
     process.env.R2_BUCKET &&
@@ -42,13 +21,6 @@ export function activeProvider(): "convex" | "r2" {
   return configured ? "r2" : "convex";
 }
 
-/**
- * Taille maximale par fichier, selon le fournisseur.
- *
- * 25 Mo sur Convex n'est pas un choix de produit mais la contrainte du tier
- * gratuit : 1 Go de sortie par mois, qu'un seul fichier de 25 Mo téléchargé
- * 40 fois suffit à consommer. R2 ne facture pas la sortie, d'où les 100 Mo.
- */
 export function maxFileBytes(): number {
   return activeProvider() === "r2" ? 100 * 1024 * 1024 : 25 * 1024 * 1024;
 }
@@ -85,11 +57,7 @@ export async function createUploadTarget(
     maxBytes: maxFileBytes(),
   };
 }
-
-/**
- * URL de lecture. Signée et temporaire côté R2, d'où le `null` possible si
- * l'objet a disparu entre-temps.
- */
+// peut etre null si l'objet a disparu entre temps.
 export async function getUrl(
   ctx: QueryCtx | MutationCtx | ActionCtx,
   ref: StorageRef,

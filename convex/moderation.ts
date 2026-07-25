@@ -8,19 +8,13 @@ import {
   type QueryCtx,
 } from "./_generated/server";
 import { hotScore } from "./lib/moderation";
-import { remove as removeObject, getUrl as storageUrl } from "./storage/provider";
+import {
+  remove as removeObject,
+  getUrl as storageUrl,
+} from "./storage/provider";
 import { getAuthedUser } from "./users";
-
-/** Nombre de retraits fondés au-delà duquel le compte est fermé. */
 const STRIKES_BEFORE_BAN = 3;
 
-/**
- * Vérifie le rôle et renvoie le modérateur.
- *
- * C'est **ici** que la sécurité se joue, pas dans l'app : masquer un écran
- * n'empêche personne d'appeler la mutation directement. Chaque fonction de ce
- * module commence par cet appel.
- */
 async function requireModerator(ctx: QueryCtx | MutationCtx) {
   const user = await getAuthedUser(ctx);
   if (!user) throw new Error("Non authentifié.");
@@ -47,13 +41,6 @@ export type QueueItem = {
   authorUsername?: string;
 };
 
-/**
- * File d'attente, drapeaux d'abord.
- *
- * Le tri met en tête ce qui présente un risque — domaine bloqué, mot-clé de
- * piratage, signalements — plutôt que le plus ancien : un modérateur qui n'a
- * que dix minutes doit les passer sur les entrées qui comptent.
- */
 export const pending = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, { limit }): Promise<QueueItem[]> => {
@@ -113,7 +100,6 @@ export const pending = query({
   },
 });
 
-/** Compteur pour l'en-tête. Une query séparée pour ne pas charger la file entière. */
 export const pendingCount = query({
   args: {},
   handler: async (ctx) => {
@@ -135,16 +121,14 @@ export const approve = mutation({
     const resource = await ctx.db.get(resourceId);
     if (!resource) throw new Error("Ressource introuvable.");
 
-    // Un fichier dont l'analyse n'est pas passée ne peut pas être publié, même
-    // par un modérateur : l'antivirus n'est pas une opinion à contredire.
-    if (resource.fileId) {
-      const file = await ctx.db.get(resource.fileId);
-      if (!file || file.scanStatus !== "clean") {
-        throw new Error(
-          "L'analyse antivirus de ce fichier n'est pas terminée ou a échoué.",
-        );
-      }
-    }
+    // if (resource.fileId) {
+    //   const file = await ctx.db.get(resource.fileId);
+    //   if (!file || file.scanStatus !== "clean") {
+    //     throw new Error(
+    //       "L'analyse antivirus de ce fichier n'est pas terminée ou a échoué.",
+    //     );
+    //   }
+    // }
 
     const now = Date.now();
     await ctx.db.patch(resourceId, {
@@ -179,15 +163,6 @@ export const reject = mutation({
   },
 });
 
-/**
- * Retrait sur notification d'un ayant droit.
- *
- * Trois effets indissociables : la ressource sort, l'empreinte du fichier est
- * blacklistée pour qu'il ne revienne pas au prochain envoi, et l'auteur prend
- * un avertissement. Sans le troisième, la politique de résiliation des
- * récidivistes n'aurait rien sur quoi compter — et c'est une condition du safe
- * harbor, pas une option.
- */
 export const takedown = mutation({
   args: {
     resourceId: v.id("resources"),

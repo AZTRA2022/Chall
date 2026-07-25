@@ -7,15 +7,8 @@ import {
   ResourceRowSkeleton,
   type ResourceListItem,
 } from "@/components/resource-row";
+import { PublicResource } from "../../convex/resources";
 
-/**
- * Liste de ressources et ses trois états.
- *
- * `data === undefined` signifie « en cours de chargement » — c'est exactement
- * ce que renvoie `useQuery` de Convex tant que la réponse n'est pas arrivée.
- * Passer le résultat de la requête directement suffit donc à obtenir les
- * squelettes, sans drapeau de chargement à gérer dans chaque écran.
- */
 export function ResourceList({
   data,
   emptyTitle,
@@ -25,7 +18,7 @@ export function ResourceList({
   header,
   skeletonCount = 6,
 }: {
-  data: ResourceListItem[] | undefined;
+  data: PublicResource[] | undefined;
   emptyTitle: string;
   emptyDescription: string;
   emptyIcon?: ReactNode;

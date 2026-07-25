@@ -1,10 +1,16 @@
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { ArrowFatUp, FilmSlate, ImageSquare, LinkSimple } from "phosphor-react-native";
+import {
+  ArrowFatUp,
+  FilmSlate,
+  ImageSquare,
+  LinkSimple,
+} from "phosphor-react-native";
 import { Pressable, Text, View } from "react-native";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { CATEGORY_LABELS, type CategoryId } from "@/constants/categories";
+import { PublicResource } from "../../convex/resources";
 
 export type ResourceListItem = {
   id: string;
@@ -12,21 +18,13 @@ export type ResourceListItem = {
   kind: "link" | "image" | "video" | "file";
   category: CategoryId;
   sourceDomain?: string;
-  /** Couverture résolue côté serveur : fichier de l'auteur, sinon vignette du lien. */
+  url: string;
   posterUrl?: string;
   voteCount: number;
   status: "pending" | "approved" | "rejected" | "dead";
 };
 
-/**
- * Carte de ressource.
- *
- * La couverture occupe toute la largeur en 16/9 : c'est elle qui fait
- * reconnaître une ressource d'un coup d'œil, bien avant son titre. Le format
- * est imposé pour que la colonne reste régulière quelle que soit l'image
- * fournie — une grille irrégulière se parcourt mal.
- */
-export function ResourceRow({ resource }: { resource: ResourceListItem }) {
+export function ResourceRow({ resource }: { resource: PublicResource }) {
   const isPending = resource.status === "pending";
 
   return (
@@ -49,6 +47,7 @@ export function ResourceRow({ resource }: { resource: ResourceListItem }) {
             />
           ) : (
             <PosterFallback kind={resource.kind} />
+            // <Text> {resource.url} </Text>
           )}
 
           {isPending ? (

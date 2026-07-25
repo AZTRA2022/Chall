@@ -8,7 +8,7 @@ import { AppHeader } from "@/components/app-header";
 import { ResourceList } from "@/components/resource-list";
 import { TextField } from "@/components/ui/text-field";
 import { useThemeColor } from "@/hooks/use-theme-color";
-
+import { router } from "expo-router";
 const SUGGESTED_TAGS = [
   "python",
   "capcut",
@@ -37,7 +37,10 @@ export default function SearchScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <AppHeader title="Recherche" />
+      <AppHeader
+        title="Recherche"
+        action={{ label: "+ Publier", onPress: () => router.push("/submit") }}
+      />
 
       <View className="px-6 py-4">
         <TextField

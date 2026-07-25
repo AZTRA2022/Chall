@@ -1,7 +1,12 @@
 import { useAction, useMutation } from "convex/react";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { FileText, FilmSlate, ImageSquare, LinkSimple } from "phosphor-react-native";
+import {
+  FileText,
+  FilmSlate,
+  ImageSquare,
+  LinkSimple,
+} from "phosphor-react-native";
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
@@ -69,14 +74,12 @@ export default function SubmitScreen() {
   const handlePick = async () => {
     setError(null);
     try {
-      const picked =
-        mode === "file" ? await pickDocument() : await pickMedia();
+      const picked = mode === "file" ? await pickDocument() : await pickMedia();
       if (!picked) return;
       setMedia(picked);
-      // Le nom du fichier fait un titre de départ acceptable, sans extension.
-      if (title.trim().length === 0) {
-        setTitle(picked.filename.replace(/\.[^.]+$/, ""));
-      }
+      // if (title.trim().length === 0) {
+      //   setTitle(picked.filename.replace(/\.[^.]+$/, ""));
+      // }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Sélection impossible.");
     }
@@ -173,9 +176,7 @@ export default function SubmitScreen() {
         [{ text: "OK", onPress: () => router.back() }],
       );
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "L'envoi a échoué. Réessayez.",
-      );
+      setError(e instanceof Error ? e.message : "L'envoi a échoué. Réessayez.");
     } finally {
       setBusy(false);
     }
@@ -211,7 +212,11 @@ export default function SubmitScreen() {
         )}
 
         <View className="gap-4">
-          <TextField placeholder="Titre" value={title} onChangeText={setTitle} />
+          <TextField
+            placeholder="Titre"
+            value={title}
+            onChangeText={setTitle}
+          />
           <TextField
             placeholder="Description (facultative)"
             multiline
@@ -239,8 +244,8 @@ export default function SubmitScreen() {
             onClear={() => setPoster(null)}
           />
           <Text className="font-sans text-xs leading-5 text-muted-foreground">
-            Facultative. C&apos;est l&apos;image qui représente la ressource dans
-            le feed. Sans couverture, la vignette du lien est utilisée.
+            Facultative. C&apos;est l&apos;image qui représente la ressource
+            dans le feed. Sans couverture, la vignette du lien est utilisée.
           </Text>
         </View>
 

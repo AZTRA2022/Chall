@@ -27,7 +27,6 @@ export type PublicResource = {
   sourceDomain?: string;
   category: Doc<"resources">["category"];
   tags: string[];
-  /** Couverture résolue : fichier de l'auteur, sinon image distante. */
   posterUrl?: string;
   voteCount: number;
   status: Doc<"resources">["status"];
@@ -132,12 +131,6 @@ async function assertUnderDailyLimit(ctx: MutationCtx, userId: Id<"users">) {
   }
 }
 
-/**
- * Publie un lien externe.
- *
- * Le statut est forcé à `pending` ici : le client ne choisit jamais l'état de
- * publication de ce qu'il envoie.
- */
 export const submitLink = mutation({
   args: {
     url: v.string(),
@@ -286,9 +279,6 @@ export const feed = query({
           ? "by_status_votes"
           : "by_status_hot";
 
-    // On récupère large puis on filtre : le blocage et la catégorie ne sont pas
-    // dans l'index, et sur-lire 3x reste bien moins coûteux qu'un parcours
-    // complet de la table.
     let resources = await ctx.db
       .query("resources")
       .withIndex(index, (q) => q.eq("status", "approved"))
@@ -316,10 +306,8 @@ export const byId = query({
     if (!resource) return null;
 
     const viewer = await getAuthedUser(ctx);
-    const isAuthor =
-      viewer !== null && resource.submittedBy === viewer._id;
-    const isModerator =
-      viewer?.role === "mod" || viewer?.role === "admin";
+    const isAuthor = viewer !== null && resource.submittedBy === viewer._id;
+    const isModerator = viewer?.role === "mod" || viewer?.role === "admin";
 
     if (resource.status !== "approved" && !isAuthor && !isModerator) {
       return null;
