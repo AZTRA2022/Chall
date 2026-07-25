@@ -1,74 +1,56 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Couleurs et polices consommées par les composants qui n'utilisent pas
+ * NativeWind (barre d'onglets flottante, `themed-*`, icônes de navigation).
+ *
+ * Thème sombre uniquement — voir `src/constants/palette.ts`. Les mêmes tokens
+ * existent en HSL dans `src/global.css` et en sémantique dans `src/lib/theme.ts`.
  */
 
-import { Platform } from "react-native";
-
-const tintColorLight = "#0a7ea4";
-const tintColorDark = "#fff";
+import { PALETTE } from "./palette";
 
 export const Colors = {
-  light: {
-    text: "#11181C",
-    background: "#fff",
-    tint: tintColorLight,
-    icon: "#687076",
-    tabIconDefault: "#687076",
-    tabIconSelected: tintColorLight,
-    // Semantic tokens — keep in sync with the CSS variables in src/global.css
-    foreground: "#0a0a0a",
-    mutedForeground: "#000",
-    border: "#e5e5e5",
-    primary: "#a3e635",
-    primaryForeground: "#171717",
-    // Floating tab bar
-    tabBar: "#ffffff",
-    tabChip: "#ffdcc7",
-    tabChipForeground: "#a3e635",
-  },
-  dark: {
-    text: "#ECEDEE",
-    background: "#151718",
-    tint: tintColorDark,
-    icon: "#9BA1A6",
-    tabIconDefault: "#9BA1A6",
-    tabIconSelected: tintColorDark,
-    // Semantic tokens — keep in sync with the CSS variables in src/global.css
-    foreground: "#fafafa",
-    mutedForeground: "#a3a3a3",
-    border: "#262626",
-    primary: "#a3e635",
-    primaryForeground: "#171717",
-    // Floating tab bar
-    tabBar: "#171717",
-    tabChip: "rgba(249, 115, 22, 0.24)",
-    tabChipForeground: "#fb923c",
-  },
+  text: PALETTE.white,
+  background: PALETTE.black,
+  tint: PALETTE.red,
+  icon: PALETTE.ash,
+  tabIconDefault: PALETTE.ash,
+  tabIconSelected: PALETTE.red,
+  foreground: PALETTE.white,
+  mutedForeground: PALETTE.ash,
+  border: PALETTE.line,
+  primary: PALETTE.red,
+  /** Rouge lisible en texte et en icône sur le fond de l'app. */
+  primaryInk: PALETTE.redLight,
+  primaryForeground: PALETTE.pure,
+  // Barre d'onglets flottante
+  tabBar: PALETTE.surface,
+  tabChip: "rgba(255, 59, 48, 0.16)",
+  tabChipForeground: PALETTE.redLight,
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: "system-ui",
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: "ui-serif",
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: "ui-rounded",
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: "ui-monospace",
-  },
-  default: {
-    sans: "normal",
-    serif: "serif",
-    rounded: "normal",
-    mono: "monospace",
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded:
-      "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+/**
+ * Rôles typographiques. Chaque rôle a un travail précis ; un texte qui ne rentre
+ * dans aucun des trois est probablement mal placé.
+ *
+ * - `display` — Bebas Neue, condensé, toujours en capitales. Titres d'écran et
+ *   grands nombres. Large et rare, jamais en petit corps.
+ * - `body` — Inter. Texte courant, titres de ressources, libellés de boutons.
+ * - `meta` — JetBrains Mono en capitales très espacées. Réservé aux métadonnées
+ *   réelles : catégorie, domaine source, taille de fichier, compteurs, statut.
+ *   Jamais décoratif — s'il n'y a pas de donnée, il n'y a pas de `meta`.
+ */
+export const Fonts = {
+  display: "BebasNeue_400Regular",
+  body: "Inter_400Regular",
+  bodyMedium: "Inter_500Medium",
+  bodySemibold: "Inter_600SemiBold",
+  bodyBold: "Inter_700Bold",
+  meta: "JetBrainsMono_400Regular",
+  metaBold: "JetBrainsMono_700Bold",
+} as const;
+
+/**
+ * Interlettrage des libellés `meta`, en points. React Native attend une valeur
+ * absolue, pas un `em` — ce chiffre correspond à ~0.16em à 11px.
+ */
+export const META_TRACKING = 1.8;

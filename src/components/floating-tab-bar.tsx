@@ -2,6 +2,7 @@ import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Fonts } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
 export function FloatingTabBar({
@@ -17,11 +18,7 @@ export function FloatingTabBar({
   const border = useThemeColor({}, "border");
 
   return (
-    <View
-      pointerEvents="box-none"
-      style={{ bottom: insets.bottom + 10 }}
-      className="absolute left-16 right-12  "
-    >
+    <View pointerEvents="box-none" style={{}}>
       <View
         style={[styles.bar, { backgroundColor: tabBar, borderColor: border }]}
       >
@@ -54,16 +51,16 @@ export function FloatingTabBar({
             <Pressable
               key={route.key}
               accessibilityRole="button"
-              accessibilityState={focused ? { selected: true } : {}}
-              accessibilityLabel={options.tabBarAccessibilityLabel}
+              accessibilityState={{ selected: focused }}
+              accessibilityLabel={options.tabBarAccessibilityLabel ?? label}
               onPress={onPress}
               onLongPress={onLongPress}
+              className="flex items-center "
               style={({ pressed }) => [
                 styles.item,
                 focused && { backgroundColor: tabChip },
                 pressed && { opacity: 0.6 },
               ]}
-              className={` flex items-center justify-center ${focused ? "" : ""}`}
             >
               {options.tabBarIcon?.({ focused, color, size: 22 })}
               <Text numberOfLines={1} style={[styles.label, { color }]}>
@@ -82,18 +79,19 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 16,
     right: 16,
-    alignItems: "center",
   },
   bar: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    maxWidth: "90%",
-    gap: 40,
-    padding: 12,
-    borderRadius: 999,
+
+    alignSelf: "stretch",
+    justifyContent: "space-between",
+
+    padding: 18,
+    borderRadius: 0,
     borderWidth: StyleSheet.hairlineWidth,
-    boxShadow: "0px 6px 28px rgba(0, 0, 0, 0.07)",
+
+    boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.5)",
   },
   item: {
     flex: 1,
@@ -101,12 +99,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 3,
     paddingVertical: 8,
-    paddingHorizontal: 10,
+    paddingHorizontal: 4,
     borderRadius: 999,
   },
   label: {
-    fontSize: 11,
-    fontWeight: "600",
+    fontFamily: Fonts.bodyMedium,
+    fontSize: 10,
     textAlign: "center",
   },
 });

@@ -1,28 +1,26 @@
 import { Tabs } from "expo-router";
 import {
-  DotsNineIcon,
+  BookmarkSimple,
   Gear,
   House,
-  Trophy,
-  User,
-  VideoCamera,
+  MagnifyingGlass,
 } from "phosphor-react-native";
 
 import { FloatingTabBar } from "@/components/floating-tab-bar";
-import { Pressable, Text, View } from "react-native";
-import * as NavigationBar from "expo-navigation-bar";
+
 export default function TabLayout() {
   return (
     <Tabs
       tabBar={(props) => <FloatingTabBar {...props} />}
       screenOptions={{
-        headerShown: true,
+        headerShown: false,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "Accueil",
+
           tabBarIcon: ({ color, size, focused }) => (
             <House
               size={size}
@@ -30,33 +28,14 @@ export default function TabLayout() {
               weight={focused ? "fill" : "bold"}
             />
           ),
-          headerTransparent: true,
-          headerTitle: "",
-
-          headerStyle: {
-            backgroundColor: "transparent",
-          },
-          headerShadowVisible: false,
-          headerRight: () => (
-            <Pressable
-              className="mr-4 flex items-center justify-center rounded-full bg-zinc-100 px-4 py-2"
-              onPress={() => {
-                alert("Hey Guys !");
-              }}
-            >
-              <Text className="font-mono-bold text-xl">+</Text>
-            </Pressable>
-          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
-
+        name="search"
         options={{
-          title: "Explore",
-          headerShown: false,
+          title: "Recherche",
           tabBarIcon: ({ color, size, focused }) => (
-            <DotsNineIcon
+            <MagnifyingGlass
               size={size}
               color={color}
               weight={focused ? "fill" : "bold"}
@@ -64,22 +43,23 @@ export default function TabLayout() {
           ),
         }}
       />
-
+      <Tabs.Screen
+        name="library"
+        options={{
+          title: "Bibliothèque",
+          tabBarIcon: ({ color, size, focused }) => (
+            <BookmarkSimple
+              size={size}
+              color={color}
+              weight={focused ? "fill" : "bold"}
+            />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Settings",
-          headerShown: true,
-          headerShadowVisible: false,
-          headerTitleAlign: "center",
-          headerTransparent: true,
-          headerStyle: {
-            backgroundColor: "transparent",
-          },
-          headerTitleStyle: {
-            fontFamily: "sans",
-            fontWeight: "bold",
-          },
+          title: "Paramètres",
           tabBarIcon: ({ color, size, focused }) => (
             <Gear
               size={size}

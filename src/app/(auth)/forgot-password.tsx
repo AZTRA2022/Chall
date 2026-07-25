@@ -1,13 +1,14 @@
 import { useSignIn } from "@clerk/expo";
 import { router } from "expo-router";
-import { CaretLeft, Envelope, Lock } from "phosphor-react-native";
+import { Envelope, Lock } from "phosphor-react-native";
 import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import { AppHeader } from "@/components/app-header";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/text-field";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { clerkErrorMessage } from "@/lib/clerk-errors";
 import {
   fieldErrors,
   forgotPasswordSchema,
@@ -16,7 +17,6 @@ import {
 
 export default function ForgotPasswordScreen() {
   const mutedForeground = useThemeColor({}, "mutedForeground");
-  const foreground = useThemeColor({}, "foreground");
 
   const { signIn } = useSignIn();
 
@@ -44,13 +44,13 @@ export default function ForgotPasswordScreen() {
     });
     if (createError) {
       setLoading(false);
-      setError(createError.message ?? "Could not find that account.");
+      setError(clerkErrorMessage(createError));
       return;
     }
     const { error: sendError } = await signIn.resetPasswordEmailCode.sendCode();
     setLoading(false);
     if (sendError) {
-      setError(sendError.message ?? "Could not send the code.");
+      setError(clerkErrorMessage(sendError));
       return;
     }
     setEmail(parsed.data.email);
@@ -76,7 +76,7 @@ export default function ForgotPasswordScreen() {
       await signIn.resetPasswordEmailCode.verifyCode({ code: parsed.data.code });
     if (verifyError) {
       setLoading(false);
-      setError(verifyError.message ?? "Invalid code.");
+      setError(clerkErrorMessage(verifyError));
       return;
     }
 
@@ -87,7 +87,7 @@ export default function ForgotPasswordScreen() {
       });
     if (submitError) {
       setLoading(false);
-      setError(submitError.message ?? "Could not reset your password.");
+      setError(clerkErrorMessage(submitError));
       return;
     }
 
@@ -98,34 +98,31 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <View className="flex-1 bg-background">
+      <AppHeader
+        back
+        title={step === "email" ? "Mot de passe" : "Nouveau mot de passe"}
+      />
       <ScrollView
         className="flex-1"
-        contentContainerClassName="gap-8 px-6 pb-8 pt-2"
+        contentContainerClassName="gap-8 px-6 pb-8 pt-6"
         keyboardShouldPersistTaps="handled"
       >
-        <Pressable
-          onPress={() => router.back()}
-          className="h-11 w-11 items-center justify-center rounded-full bg-muted"
-        >
-          <CaretLeft size={20} color={foreground} weight="bold" />
-        </Pressable>
-
         <View className="gap-2">
           <Text className="font-display text-display-sm text-foreground">
-            {step === "email" ? "RESET PASSWORD" : "ENTER CODE"}
+            {step === "email" ? "MOT DE PASSE OUBLIÉ" : "SAISIR LE CODE"}
           </Text>
           <Text className="font-sans text-base text-muted-foreground">
             {step === "email"
-              ? "We'll send a code to your email."
-              : `Enter the code sent to ${email} and choose a new password.`}
+              ? "Nous vous envoyons un code par e-mail."
+              : `Saisissez le code envoyé à ${email} et choisissez un nouveau mot de passe.`}
           </Text>
         </View>
 
         {step === "email" ? (
           <View className="gap-4">
             <TextField
-              placeholder="Email"
+              placeholder="Adresse e-mail"
               autoCapitalize="none"
               keyboardType="email-address"
               textContentType="emailAddress"
@@ -144,7 +141,7 @@ export default function ForgotPasswordScreen() {
               </Text>
             ) : null}
             <Button
-              label="Send code"
+              label="Envoyer le code"
               onPress={handleSendCode}
               loading={loading}
               disabled={loading}
@@ -153,7 +150,7 @@ export default function ForgotPasswordScreen() {
         ) : (
           <View className="gap-4">
             <TextField
-              placeholder="Code"
+              placeholder="Code reçu"
               keyboardType="number-pad"
               maxLength={8}
               value={code}
@@ -165,7 +162,7 @@ export default function ForgotPasswordScreen() {
               </Text>
             ) : null}
             <TextField
-              placeholder="New password"
+              placeholder="Nouveau mot de passe"
               secureTextEntry
               textContentType="newPassword"
               value={password}
@@ -183,19 +180,19 @@ export default function ForgotPasswordScreen() {
               </Text>
             ) : null}
             <Button
-              label="Reset password"
+              label="Réinitialiser"
               onPress={handleResetPassword}
               loading={loading}
               disabled={loading}
             />
             <Pressable onPress={() => setStep("email")}>
-              <Text className="text-center font-sans-medium text-sm text-primary">
-                Use a different email
+              <Text className="text-center font-sans-medium text-sm text-primary-ink">
+                Utiliser une autre adresse
               </Text>
             </Pressable>
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

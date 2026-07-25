@@ -9,8 +9,17 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as crons from "../crons.js";
+import type * as files from "../files.js";
 import type * as http from "../http.js";
+import type * as lib_moderation from "../lib/moderation.js";
+import type * as lib_url from "../lib/url.js";
+import type * as moderation from "../moderation.js";
 import type * as push from "../push.js";
+import type * as resources from "../resources.js";
+import type * as social from "../social.js";
+import type * as storage_migrate from "../storage/migrate.js";
+import type * as storage_provider from "../storage/provider.js";
 import type * as users from "../users.js";
 
 import type {
@@ -21,8 +30,17 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  crons: typeof crons;
+  files: typeof files;
   http: typeof http;
+  "lib/moderation": typeof lib_moderation;
+  "lib/url": typeof lib_url;
+  moderation: typeof moderation;
   push: typeof push;
+  resources: typeof resources;
+  social: typeof social;
+  "storage/migrate": typeof storage_migrate;
+  "storage/provider": typeof storage_provider;
   users: typeof users;
 }>;
 
@@ -52,4 +70,6 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {};
+export declare const components: {
+  r2: import("@convex-dev/r2/_generated/component.js").ComponentApi<"r2">;
+};

@@ -21,13 +21,13 @@ import * as NavigationBar from "expo-navigation-bar";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { colorScheme } from "nativewind";
 import { useEffect } from "react";
 import { Platform } from "react-native";
 import "react-native-reanimated";
 import "../global.css";
 
 import { LoadingScreen } from "@/components/loading-screen";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { convex } from "@/lib/convex";
 import {
   registerForPushNotificationsAsync,
@@ -38,13 +38,17 @@ import { NAV_THEME } from "@/lib/theme";
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({ duration: 300, fade: true });
 
+// L'app est en thème sombre uniquement. Les variantes `dark:` de NativeWind
+// dépendent de cette classe, pas du réglage système : sans cet appel, elles ne
+// s'appliqueraient jamais. Hors composant, pour être posé avant le premier rendu.
+colorScheme.set("dark");
+
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 if (!publishableKey) {
   throw new Error("Add EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY to your .env.local");
 }
 
 function RootNavigator() {
-  const colorScheme = useColorScheme();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const savePushToken = useMutation(api.users.savePushToken);
 
@@ -85,18 +89,29 @@ function RootNavigator() {
   }
 
   return (
-    <ThemeProvider
-      value={colorScheme === "dark" ? NAV_THEME.dark : NAV_THEME.light}
-    >
+    <ThemeProvider value={NAV_THEME}>
       <Stack>
         <Stack.Protected guard={!isAuthenticated}>
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         </Stack.Protected>
         <Stack.Protected guard={isAuthenticated}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="resource/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="profile/edit" options={{ headerShown: false }} />
+          <Stack.Screen name="profile/blocked" options={{ headerShown: false }} />
+          <Stack.Screen name="(mod)/queue" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="submit"
+            options={{ headerShown: false, presentation: "formSheet" }}
+          />
         </Stack.Protected>
+        {/* Hors des gardes : les documents contractuels doivent être
+            consultables avant même la création du compte. */}
+        <Stack.Screen name="legal/terms" options={{ headerShown: false }} />
+        <Stack.Screen name="legal/privacy" options={{ headerShown: false }} />
       </Stack>
-      <StatusBar style="auto" />
+      {/* Contenu clair : le fond est toujours sombre. */}
+      <StatusBar style="light" />
 
       <PortalHost />
     </ThemeProvider>

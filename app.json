@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "chall",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
@@ -16,7 +16,7 @@
     "android": {
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
-        "backgroundColor": "#a3e635",
+        "backgroundColor": "#0A0A0A",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
@@ -40,14 +40,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/chall-mark-dark.png",
+          "image": "./assets/images/chall-mark-light.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "image": "./assets/images/chall-mark-light.png",
-            "backgroundColor": "#000000"
-          }
+          "backgroundColor": "#0A0A0A"
         }
       ],
       "react-native-fast-tflite",

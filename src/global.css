@@ -2,49 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+ * Thème sombre uniquement. Mêmes valeurs que `src/constants/palette.ts`,
+ * exprimées en HSL — toute modification ici doit être répercutée là-bas, et
+ * inversement.
+ *
+ * Les valeurs sont sur `:root` et non sur `.dark:root` : l'app n'a qu'un thème,
+ * et ça évite un éclair de couleurs claires avant que la classe soit posée.
+ * Les variantes `dark:` des composants continuent de fonctionner grâce au
+ * `colorScheme.set("dark")` de `src/app/_layout.tsx`.
+ */
+
 @layer base {
   :root {
-    --background: 0 0% 96.1%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 83 78% 56%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 83 78% 56%;
-    --radius: 0.625rem;
-  }
-
-  .dark:root {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 6.7%;
+    --background: 0 0% 3.9%; /* black */
+    --foreground: 0 0% 98%; /* white */
+    --card: 0 0% 7.8%; /* surface */
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 6.7%;
+    --popover: 0 0% 7.8%;
     --popover-foreground: 0 0% 98%;
-    --primary: 83 78% 56%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
+    --primary: 4 100% 60%; /* red */
+    --primary-foreground: 0 0% 100%;
+    --primary-ink: 4 100% 72%; /* redLight — texte rouge lisible sur le fond */
+    --secondary: 0 0% 11.8%; /* elevated */
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
+    --muted: 0 0% 11.8%;
+    --muted-foreground: 0 0% 55%; /* ash */
+    --accent: 0 0% 14.9%; /* line */
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
+    --destructive: 4 76% 45%; /* redDeep */
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 14.9%; /* line */
     --input: 0 0% 14.9%;
-    --ring: 83 78% 56%;
+    --ring: 4 100% 60%;
+    --radius: 0.375rem;
   }
 }

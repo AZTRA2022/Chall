@@ -18,7 +18,7 @@ export const TextField = forwardRef<
   return (
     <View
       className={cn(
-        "h-14 flex-row items-center gap-3 rounded-2xl border border-border bg-muted px-4",
+        "h-14 flex-row items-center gap-3 rounded-md border border-border bg-muted px-4",
         className,
       )}
     >

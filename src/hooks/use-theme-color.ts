@@ -1,21 +1,16 @@
 /**
- * Learn more about light and dark modes:
- * https://docs.expo.dev/guides/color-schemes/
+ * Lit un token de couleur du thème.
+ *
+ * L'app est en thème sombre uniquement, donc il n'y a qu'un seul jeu de valeurs.
+ * `override.dark` laisse un composant forcer une couleur précise sans
+ * court-circuiter le reste du système.
  */
 
 import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export function useThemeColor(
-  props: { light?: string; dark?: string },
-  colorName: keyof typeof Colors.light & keyof typeof Colors.dark,
+  override: { dark?: string },
+  colorName: keyof typeof Colors,
 ) {
-  const theme = useColorScheme() ?? "light";
-  const colorFromProps = props[theme];
-
-  if (colorFromProps) {
-    return colorFromProps;
-  } else {
-    return Colors[theme][colorName];
-  }
+  return override.dark ?? Colors[colorName];
 }

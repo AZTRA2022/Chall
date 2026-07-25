@@ -1,7 +1,6 @@
 import { useSignIn, useSSO } from "@clerk/expo";
 import { Link, router } from "expo-router";
 import {
-  CaretLeft,
   Envelope,
   Eye,
   EyeSlash,
@@ -11,11 +10,12 @@ import {
 } from "phosphor-react-native";
 import { useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import { AppHeader } from "@/components/app-header";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/text-field";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { clerkErrorMessage } from "@/lib/clerk-errors";
 import { fieldErrors, loginSchema } from "@/lib/validations/auth";
 
 export default function LoginScreen() {
@@ -43,7 +43,7 @@ export default function LoginScreen() {
         router.replace("/(tabs)");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not sign in.");
+      setError(clerkErrorMessage(err));
     }
   };
 
@@ -65,7 +65,7 @@ export default function LoginScreen() {
     });
     if (signInError) {
       setLoading(false);
-      setError(signInError.message ?? "Could not sign you in.");
+      setError(clerkErrorMessage(signInError));
       return;
     }
 
@@ -76,31 +76,25 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <View className="flex-1 bg-background">
+      <AppHeader back title="Connexion" />
       <ScrollView
         className="flex-1"
-        contentContainerClassName="gap-8 px-6 pb-8 pt-2"
+        contentContainerClassName="gap-8 px-6 pb-8 pt-6"
         keyboardShouldPersistTaps="handled"
       >
-        <Pressable
-          onPress={() => router.back()}
-          className="h-11 w-11 items-center justify-center rounded-full bg-muted"
-        >
-          <CaretLeft size={20} color={foreground} weight="bold" />
-        </Pressable>
-
         <View className="gap-2">
           <Text className="font-display text-display-sm text-foreground">
-            WELCOME BACK
+            CONTENT DE VOUS REVOIR
           </Text>
           <Text className="font-sans text-base text-muted-foreground">
-            Log in to keep your streak going and jump back into your challenges.
+            Connectez-vous pour retrouver vos ressources et vos collections.
           </Text>
         </View>
 
         <View className="gap-4">
           <TextField
-            placeholder="Email"
+            placeholder="Adresse e-mail"
             autoCapitalize="none"
             keyboardType="email-address"
             textContentType="emailAddress"
@@ -114,7 +108,7 @@ export default function LoginScreen() {
             </Text>
           ) : null}
           <TextField
-            placeholder="Password"
+            placeholder="Mot de passe"
             secureTextEntry={!showPassword}
             textContentType="password"
             value={password}
@@ -142,14 +136,14 @@ export default function LoginScreen() {
 
         <View className="flex-row items-center justify-end">
           <Link href="/(auth)/forgot-password">
-            <Text className="font-sans-medium text-sm text-primary">
-              Forgot password?
+            <Text className="font-sans-medium text-sm text-primary-ink">
+              Mot de passe oublié ?
             </Text>
           </Link>
         </View>
 
         <Button
-          label="Log In"
+          label="Se connecter"
           onPress={handleLogin}
           loading={loading}
           disabled={!canSubmit}
@@ -158,7 +152,7 @@ export default function LoginScreen() {
         <View className="flex-row items-center gap-3">
           <View className="h-px flex-1 bg-border" />
           <Text className="font-sans text-sm text-muted-foreground">
-            or log in with
+            ou se connecter avec
           </Text>
           <View className="h-px flex-1 bg-border" />
         </View>
@@ -176,14 +170,14 @@ export default function LoginScreen() {
 
         <View className="flex-row justify-center gap-1">
           <Text className="font-sans text-muted-foreground">
-            Don&apos;t have an account?
+            Vous n&apos;avez pas de compte ?
           </Text>
           <Link href="/(auth)/register">
-            <Text className="font-sans-semibold text-primary">Sign up</Text>
+            <Text className="font-sans-semibold text-primary-ink">Créer un compte</Text>
           </Link>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

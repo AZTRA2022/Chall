@@ -1,7 +1,7 @@
 import { useSignUp, useSSO } from "@clerk/expo";
+import { useMutation } from "convex/react";
 import { router } from "expo-router";
 import {
-  CaretLeft,
   Envelope,
   Eye,
   EyeSlash,
@@ -11,11 +11,15 @@ import {
 } from "phosphor-react-native";
 import { useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import { api } from "../../../convex/_generated/api";
+import { AppHeader } from "@/components/app-header";
+import { LegalConsent } from "@/components/legal-consent";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/text-field";
+import { PRIVACY_VERSION, TERMS_VERSION } from "@/constants/legal";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { clerkErrorMessage } from "@/lib/clerk-errors";
 import { fieldErrors, registerSchema } from "@/lib/validations/auth";
 
 export default function RegisterScreen() {
@@ -24,33 +28,60 @@ export default function RegisterScreen() {
 
   const { signUp } = useSignUp();
   const { startSSOFlow } = useSSO();
+  const acceptLegalTerms = useMutation(api.users.acceptLegalTerms);
 
   const [step, setStep] = useState<"form" | "verify">("form");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [confirmedAge, setConfirmedAge] = useState(false);
   const [code, setCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  /**
+   * L'acceptation conditionne toutes les voies d'inscription, e-mail comme SSO.
+   * La porter uniquement sur le bouton e-mail laisserait deux boutons sociaux
+   * capables de créer un compte sans qu'aucun contrat n'ait été accepté.
+   */
+  const hasConsented = acceptedTerms && confirmedAge;
+
   const canSubmit =
     email.trim().length > 0 &&
     password.length > 0 &&
     confirmPassword.length > 0 &&
+    hasConsented &&
     !loading;
 
-  const handleSocialSignUp = async (strategy: "oauth_google" | "oauth_github") => {
+  /** Enregistre l'acceptation dès que la session existe, avant d'entrer dans l'app. */
+  const recordConsent = () =>
+    acceptLegalTerms({
+      termsVersion: TERMS_VERSION,
+      privacyVersion: PRIVACY_VERSION,
+    });
+
+  const handleSocialSignUp = async (
+    strategy: "oauth_google" | "oauth_github",
+  ) => {
+    if (!hasConsented) {
+      setError(
+        "Acceptez les conditions et confirmez votre âge avant de continuer.",
+      );
+      return;
+    }
     setError(null);
     try {
       const { createdSessionId, setActive } = await startSSOFlow({ strategy });
       if (createdSessionId && setActive) {
         await setActive({ session: createdSessionId });
+        await recordConsent();
         router.replace("/(tabs)");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not sign up.");
+      setError(clerkErrorMessage(err));
     }
   };
 
@@ -63,6 +94,8 @@ export default function RegisterScreen() {
       email: email.trim(),
       password,
       confirmPassword,
+      acceptedTerms,
+      confirmedAge,
     });
     if (!parsed.success) {
       setErrors(fieldErrors(parsed.error));
@@ -76,7 +109,7 @@ export default function RegisterScreen() {
     });
     if (signUpError) {
       setLoading(false);
-      setError(signUpError.message ?? "Could not create your account.");
+      setError(clerkErrorMessage(signUpError));
       return;
     }
 
@@ -94,37 +127,39 @@ export default function RegisterScreen() {
     });
     if (verifyError) {
       setLoading(false);
-      setError(verifyError.message ?? "Invalid code.");
+      setError(clerkErrorMessage(verifyError));
       return;
     }
     if (signUp.status === "complete") {
-      await signUp.finalize({ navigate: () => router.replace("/(tabs)") });
+      await signUp.finalize({
+        navigate: async () => {
+          await recordConsent();
+          router.replace("/(tabs)");
+        },
+      });
     }
     setLoading(false);
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <View className="flex-1 bg-background">
+      <AppHeader
+        back
+        title={step === "form" ? "Inscription" : "Vérification"}
+      />
       <ScrollView
         className="flex-1"
-        contentContainerClassName="gap-8 px-6 pb-8 pt-2"
+        contentContainerClassName="gap-8 px-6 pb-8 pt-6"
         keyboardShouldPersistTaps="handled"
       >
-        <Pressable
-          onPress={() => router.back()}
-          className="h-11 w-11 items-center justify-center rounded-full bg-muted"
-        >
-          <CaretLeft size={20} color={foreground} weight="bold" />
-        </Pressable>
-
         <View className="gap-2">
           <Text className="font-display text-display-sm text-foreground">
-            {step === "form" ? "CREATE ACCOUNT" : "VERIFY EMAIL"}
+            {step === "form" ? "CRÉER UN COMPTE" : "VÉRIFIER L'E-MAIL"}
           </Text>
           <Text className="font-sans text-base text-muted-foreground">
             {step === "form"
-              ? "Set up your profile to start logging reps and joining challenges."
-              : `Enter the code we sent to ${email}.`}
+              ? "Rejoignez la communauté pour partager et retrouver des ressources gratuites."
+              : `Saisissez le code envoyé à ${email}.`}
           </Text>
         </View>
 
@@ -132,7 +167,7 @@ export default function RegisterScreen() {
           <>
             <View className="gap-4">
               <TextField
-                placeholder="Email"
+                placeholder="Adresse e-mail"
                 autoCapitalize="none"
                 keyboardType="email-address"
                 textContentType="emailAddress"
@@ -146,14 +181,22 @@ export default function RegisterScreen() {
                 </Text>
               ) : null}
               <TextField
-                placeholder="Password"
+                placeholder="Mot de passe"
                 secureTextEntry={!showPassword}
                 textContentType="newPassword"
                 value={password}
                 onChangeText={setPassword}
                 icon={<Lock size={20} color={mutedForeground} />}
                 rightAdornment={
-                  <Pressable onPress={() => setShowPassword((v) => !v)}>
+                  <Pressable
+                    onPress={() => setShowPassword((v) => !v)}
+                    accessibilityRole="button"
+                    accessibilityLabel={
+                      showPassword
+                        ? "Masquer le mot de passe"
+                        : "Afficher le mot de passe"
+                    }
+                  >
                     {showPassword ? (
                       <EyeSlash size={20} color={mutedForeground} />
                     ) : (
@@ -168,7 +211,7 @@ export default function RegisterScreen() {
                 </Text>
               ) : null}
               <TextField
-                placeholder="Confirm password"
+                placeholder="Confirmer le mot de passe"
                 secureTextEntry={!showPassword}
                 textContentType="newPassword"
                 value={confirmPassword}
@@ -180,17 +223,24 @@ export default function RegisterScreen() {
                   {errors.confirmPassword}
                 </Text>
               ) : null}
-              {error ? (
-                <Text className="font-sans text-sm text-destructive">
-                  {error}
-                </Text>
-              ) : null}
             </View>
+
+            <LegalConsent
+              acceptedTerms={acceptedTerms}
+              onAcceptedTermsChange={setAcceptedTerms}
+              confirmedAge={confirmedAge}
+              onConfirmedAgeChange={setConfirmedAge}
+              error={errors.acceptedTerms ?? errors.confirmedAge}
+            />
+
+            {error ? (
+              <Text className="font-sans text-sm text-destructive">{error}</Text>
+            ) : null}
 
             <View nativeID="clerk-captcha" />
 
             <Button
-              label="Create Account"
+              label="Créer mon compte"
               onPress={handleRegister}
               loading={loading}
               disabled={!canSubmit}
@@ -199,7 +249,7 @@ export default function RegisterScreen() {
             <View className="flex-row items-center gap-3">
               <View className="h-px flex-1 bg-border" />
               <Text className="font-sans text-sm text-muted-foreground">
-                or sign up with
+                ou s&apos;inscrire avec
               </Text>
               <View className="h-px flex-1 bg-border" />
             </View>
@@ -207,27 +257,33 @@ export default function RegisterScreen() {
             <View className="flex-row justify-center gap-4">
               <SocialButton
                 icon={<GoogleLogo size={22} color={foreground} />}
+                label="S'inscrire avec Google"
+                disabled={!hasConsented}
                 onPress={() => handleSocialSignUp("oauth_google")}
               />
               <SocialButton
                 icon={<GithubLogo size={22} color={foreground} />}
+                label="S'inscrire avec GitHub"
+                disabled={!hasConsented}
                 onPress={() => handleSocialSignUp("oauth_github")}
               />
             </View>
 
             <View className="flex-row justify-center gap-1">
               <Text className="font-sans text-muted-foreground">
-                Already have an account?
+                Vous avez déjà un compte ?
               </Text>
               <Pressable onPress={() => router.replace("/(auth)/login")}>
-                <Text className="font-sans-semibold text-primary">Log in</Text>
+                <Text className="font-sans-semibold text-primary-ink">
+                  Se connecter
+                </Text>
               </Pressable>
             </View>
           </>
         ) : (
           <View className="gap-4">
             <TextField
-              placeholder="6-digit code"
+              placeholder="Code à 6 chiffres"
               keyboardType="number-pad"
               maxLength={6}
               value={code}
@@ -239,34 +295,44 @@ export default function RegisterScreen() {
               </Text>
             ) : null}
             <Button
-              label="Verify"
+              label="Vérifier"
               onPress={handleVerify}
               loading={loading}
               disabled={loading || code.trim().length === 0}
             />
             <Pressable onPress={() => setStep("form")}>
-              <Text className="text-center font-sans-medium text-sm text-primary">
-                Use a different email
+              <Text className="text-center font-sans-medium text-sm text-primary-ink">
+                Utiliser une autre adresse
               </Text>
             </Pressable>
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 function SocialButton({
   icon,
+  label,
+  disabled,
   onPress,
 }: {
   icon: ReactNode;
+  label: string;
+  disabled?: boolean;
   onPress: () => void;
 }) {
   return (
     <Pressable
       onPress={onPress}
-      className="h-14 w-14 items-center justify-center rounded-full border border-border bg-muted active:opacity-80"
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled }}
+      className={`h-14 w-14 items-center justify-center rounded-full border border-border bg-muted active:opacity-80 ${
+        disabled ? "opacity-40" : ""
+      }`}
     >
       {icon}
     </Pressable>

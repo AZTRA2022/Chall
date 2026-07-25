@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useEffect } from "react";
-import { StyleSheet, View, useColorScheme } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -12,19 +12,14 @@ import Animated, {
 
 import { COLORS } from "@/lib/theme";
 
-const MARK_DARK = require("../../assets/images/chall-mark-dark.png"); // logo noir → fond clair
-const MARK_LIGHT = require("../../assets/images/chall-mark-light.png"); // logo blanc → fond sombre
+// Logo blanc, sur le fond sombre de l'app.
+const MARK = require("../../assets/images/chall-mark-light.png");
 
 /**
  * Écran de chargement animé au logo Chall.
  * Pulse doux (scale + opacité) pendant le chargement fonts / auth.
  */
 export function LoadingScreen() {
-  const scheme = useColorScheme();
-  const isDark = scheme === "dark";
-  const bg = isDark ? COLORS.dark.background : COLORS.light.background;
-  const mark = isDark ? MARK_LIGHT : MARK_DARK;
-
   const progress = useSharedValue(0);
 
   useEffect(() => {
@@ -44,10 +39,10 @@ export function LoadingScreen() {
   }));
 
   return (
-    <View style={[styles.container, { backgroundColor: bg }]}>
+    <View style={[styles.container, { backgroundColor: COLORS.background }]}>
       <Animated.View style={animatedStyle}>
         <Image
-          source={mark}
+          source={MARK}
           style={styles.logo}
           contentFit="contain"
           transition={200}

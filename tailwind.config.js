@@ -7,9 +7,17 @@ module.exports = {
   theme: {
     extend: {
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        // Échelle dérivée de --radius (6px). Registre technique : des rayons
+        // serrés, qui montent seulement avec la taille de la surface.
+        //   sm  4px  — cases à cocher, badges, puces, code inline
+        //   md  6px  — boutons, champs, vignettes
+        //   lg 10px  — cartes
+        //   xl 14px  — modales, feuilles
+        //   full     — avatars, interrupteurs
+        sm: "calc(var(--radius) - 2px)",
+        md: "var(--radius)",
+        lg: "calc(var(--radius) + 4px)",
+        xl: "calc(var(--radius) + 8px)",
       },
       colors: {
         border: "hsl(var(--border))",
@@ -20,6 +28,9 @@ module.exports = {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          // Rouge lisible en texte/icône sur le fond du thème courant.
+          // `bg-primary` sert aux aplats, `text-primary-ink` au texte.
+          ink: "hsl(var(--primary-ink))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -58,11 +69,21 @@ module.exports = {
         "mono-bold": ["JetBrainsMono_700Bold"],
       },
       fontSize: {
-        // App-specific scale for rep counters / timers, on top of Tailwind's defaults.
-        "display-sm": ["40px", { lineHeight: "44px" }],
-        "display-md": ["56px", { lineHeight: "60px" }],
-        "display-lg": ["72px", { lineHeight: "76px" }],
-        "display-xl": ["96px", { lineHeight: "96px" }],
+        // Échelle Bebas Neue : titres d'écran et grands nombres. Toujours en
+        // capitales, avec `font-display`.
+        "display-sm": ["40px", { lineHeight: "40px" }],
+        "display-md": ["56px", { lineHeight: "54px" }],
+        "display-lg": ["72px", { lineHeight: "68px" }],
+        "display-xl": ["96px", { lineHeight: "90px" }],
+        // Libellés `meta` : JetBrains Mono en capitales espacées, pour les
+        // métadonnées (catégorie, domaine, taille, compteurs, statut).
+        meta: ["11px", { lineHeight: "14px" }],
+        "meta-lg": ["13px", { lineHeight: "16px" }],
+      },
+      letterSpacing: {
+        // React Native attend des points, pas des `em`. 1.8 ≈ 0.16em à 11px.
+        meta: "1.8px",
+        "meta-wide": "2.4px",
       },
     },
   },
