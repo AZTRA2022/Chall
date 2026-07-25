@@ -79,6 +79,7 @@ function RootNavigator() {
       });
   }, [isAuthenticated, savePushToken]);
 
+  NavigationBar.setVisibilityAsync("hidden");
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -96,6 +97,7 @@ function RootNavigator() {
         </Stack.Protected>
       </Stack>
       <StatusBar style="auto" />
+
       <PortalHost />
     </ThemeProvider>
   );
@@ -121,6 +123,7 @@ export default function RootLayout() {
   if (!fontsLoaded) {
     return <LoadingScreen />;
   }
+  NavigationBar.setBehaviorAsync("overlay-swipe");
 
   return (
     <ClerkProvider publishableKey={publishableKey!} tokenCache={tokenCache}>

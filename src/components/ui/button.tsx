@@ -44,7 +44,7 @@ export const Button = forwardRef<ComponentRef<typeof Pressable>, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={cn(
-          "flex-row items-center justify-center rounded-full p-4",
+          "flex-row items-center justify-center rounded-full px-4 py-2",
           variantClasses[variant],
           (disabled || loading) && "opacity-50",
           className,

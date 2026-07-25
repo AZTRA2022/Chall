@@ -18,14 +18,14 @@ export const Colors = {
     tabIconSelected: tintColorLight,
     // Semantic tokens — keep in sync with the CSS variables in src/global.css
     foreground: "#0a0a0a",
-    mutedForeground: "#737373",
+    mutedForeground: "#000",
     border: "#e5e5e5",
     primary: "#a3e635",
     primaryForeground: "#171717",
     // Floating tab bar
     tabBar: "#ffffff",
     tabChip: "#ffdcc7",
-    tabChipForeground: "#ea580c",
+    tabChipForeground: "#a3e635",
   },
   dark: {
     text: "#ECEDEE",
