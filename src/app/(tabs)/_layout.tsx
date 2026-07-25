@@ -23,8 +23,12 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color, size }) => (
-            <House size={size} color={color} weight="fill" />
+          tabBarIcon: ({ color, size, focused }) => (
+            <House
+              size={size}
+              color={color}
+              weight={focused ? "fill" : "bold"}
+            />
           ),
           headerTransparent: true,
           headerTitle: "",
@@ -51,8 +55,12 @@ export default function TabLayout() {
         options={{
           title: "Explore",
           headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <DotsNineIcon size={size} color={color} weight="fill" />
+          tabBarIcon: ({ color, size, focused }) => (
+            <DotsNineIcon
+              size={size}
+              color={color}
+              weight={focused ? "fill" : "bold"}
+            />
           ),
         }}
       />
@@ -61,9 +69,23 @@ export default function TabLayout() {
         name="settings"
         options={{
           title: "Settings",
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <Gear size={size} color={color} weight="fill" />
+          headerShown: true,
+          headerShadowVisible: false,
+          headerTitleAlign: "center",
+          headerTransparent: true,
+          headerStyle: {
+            backgroundColor: "transparent",
+          },
+          headerTitleStyle: {
+            fontFamily: "sans",
+            fontWeight: "bold",
+          },
+          tabBarIcon: ({ color, size, focused }) => (
+            <Gear
+              size={size}
+              color={color}
+              weight={focused ? "fill" : "bold"}
+            />
           ),
         }}
       />

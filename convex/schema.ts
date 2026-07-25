@@ -6,6 +6,7 @@ export default defineSchema({
     clerkId: v.string(),
     username: v.string(),
     avatarUrl: v.optional(v.string()),
+    email: v.optional(v.string()),
     dataCollectionConsent: v.boolean(),
     /** @deprecated remplacé par la table `pushTokens`. Gardé pour les docs existants. */
     pushTokens: v.optional(v.array(v.string())),

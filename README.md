@@ -1,16 +1,10 @@
 # Chall
 
-Self-challenging & world-challenging tracker (e.g. bench press rep contests) with real-time on-device movement recognition and counting.
-
 ## Stack
 
 - **React Native + Expo (SDK 54)** — Expo Router, file-based routing
 - **NativeWind v4 + Tailwind v3** — styling
 - **Convex** — realtime backend (challenges, leaderboards, sync)
-- **react-native-vision-camera** — camera frame processors
-- **react-native-fast-tflite** — on-device pose model inference (rep detection/counting)
-
-Native modules (vision-camera, fast-tflite) require a custom **dev client** — this app cannot run in Expo Go.
 
 ## Project structure
 
@@ -19,7 +13,6 @@ src/
   app/          # Expo Router routes only — every file is a route
   screens/      # screen bodies rendered by routes (created as needed)
   components/   # reusable UI (kebab-case, one per file)
-  services/     # domain logic (pose detection, rep-counting) — created as needed
   lib/          # Convex client, shared utilities — created as needed
   hooks/        # reusable hooks
   constants/    # theme, app-wide constants
