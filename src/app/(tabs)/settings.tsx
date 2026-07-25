@@ -92,7 +92,7 @@ export default function Settings() {
 
   return (
     <View className="flex-1 bg-background">
-      <AppHeader title="Paramètres" />
+      <AppHeader title="Paramètres" back />
       <ScrollView contentContainerClassName="gap-8 px-6 pb-32 pt-6">
         <Text className="font-display text-display-sm text-foreground">
           PARAMÈTRES
@@ -143,7 +143,10 @@ export default function Settings() {
 
         <Section title="Documents">
           <LegalLink href="/legal/terms" label="Conditions d'utilisation" />
-          <LegalLink href="/legal/privacy" label="Politique de confidentialité" />
+          <LegalLink
+            href="/legal/privacy"
+            label="Politique de confidentialité"
+          />
           <Row label="Contact" value={LEGAL_ENTITY.contactEmail} />
           <Row label="Signaler un contenu" value={LEGAL_ENTITY.abuseEmail} />
         </Section>
@@ -157,7 +160,7 @@ export default function Settings() {
           />
           <Button
             label="Supprimer mon compte"
-            variant="ghost"
+            variant="primary"
             className="border border-destructive"
             onPress={confirmDelete}
             disabled={busy || !clerkUser}

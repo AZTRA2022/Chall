@@ -121,14 +121,16 @@ export const approve = mutation({
     const resource = await ctx.db.get(resourceId);
     if (!resource) throw new Error("Ressource introuvable.");
 
-    // if (resource.fileId) {
-    //   const file = await ctx.db.get(resource.fileId);
-    //   if (!file || file.scanStatus !== "clean") {
-    //     throw new Error(
-    //       "L'analyse antivirus de ce fichier n'est pas terminée ou a échoué.",
-    //     );
-    //   }
-    // }
+    // Un fichier dont l'analyse n'est pas passée ne peut pas être publié, même
+    // par un modérateur : l'antivirus n'est pas une opinion à contredire.
+    if (resource.fileId) {
+      const file = await ctx.db.get(resource.fileId);
+      if (!file || file.scanStatus !== "clean") {
+        throw new Error(
+          "L'analyse antivirus de ce fichier n'est pas terminée ou a échoué.",
+        );
+      }
+    }
 
     const now = Date.now();
     await ctx.db.patch(resourceId, {

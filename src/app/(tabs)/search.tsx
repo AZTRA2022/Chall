@@ -38,6 +38,7 @@ export default function SearchScreen() {
   return (
     <View className="flex-1 bg-background">
       <AppHeader
+        back={true}
         title="Recherche"
         action={{ label: "+ Publier", onPress: () => router.push("/submit") }}
       />

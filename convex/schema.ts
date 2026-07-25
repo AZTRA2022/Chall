@@ -147,6 +147,8 @@ export default defineSchema({
     scanStatus: scanStatusValidator,
     scanEngine: v.optional(v.string()),
     scanAt: v.optional(v.number()),
+    /** Identifiant d'analyse VirusTotal, tant que le résultat n'est pas revenu. */
+    scanAnalysisId: v.optional(v.string()),
     /** Horodatage de la déclaration d'auteur (article 5 des conditions). */
     authorDeclaredAt: v.number(),
     /** Vidé à la suppression du compte : le fichier survit, son auteur non. */

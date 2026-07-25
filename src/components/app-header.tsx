@@ -28,7 +28,7 @@ export function AppHeader({
       <View className="h-11 flex-row items-center justify-between px-4">
         <View className="min-w-20 items-start">
           {back ? (
-            <HeaderButton
+            <HeaderBackButton
               label={`←  ${backLabel}`}
               accessibilityLabel={backLabel}
               onPress={() => router.back()}
@@ -38,7 +38,7 @@ export function AppHeader({
 
         <View className="min-w-20 items-end">
           {action ? (
-            <HeaderButton
+            <HeaderActionButton
               label={
                 action.value === undefined
                   ? action.label
@@ -65,7 +65,7 @@ export function AppHeader({
   );
 }
 
-function HeaderButton({
+function HeaderBackButton({
   label,
   accessibilityLabel,
   onPress,
@@ -86,6 +86,33 @@ function HeaderButton({
       className="active:opacity-60"
     >
       <Text className="font-mono text-meta uppercase tracking-meta text-muted-foreground">
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+function HeaderActionButton({
+  label,
+  accessibilityLabel,
+  onPress,
+}: {
+  label: string;
+  accessibilityLabel: string;
+  onPress?: () => void;
+}) {
+  // Le texte fait 11px : sans hitSlop la cible serait bien en dessous des 44pt
+  // recommandés, alors que le rendu doit rester fin.
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      hitSlop={{ top: 14, bottom: 14, left: 12, right: 12 }}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      className="bg-primary p-2 active:opacity-60"
+    >
+      <Text className="font-mono text-meta uppercase tracking-meta text-background ">
         {label}
       </Text>
     </Pressable>

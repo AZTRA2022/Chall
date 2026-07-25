@@ -24,8 +24,8 @@ export const Colors = {
   primaryForeground: PALETTE.pure,
   // Barre d'onglets flottante
   tabBar: PALETTE.surface,
-  tabChip: "rgba(255, 59, 48, 0.16)",
-  tabChipForeground: PALETTE.redLight,
+  tabChip: "#FF3B30",
+  tabChipForeground: PALETTE.red,
 };
 
 /**

@@ -1,5 +1,9 @@
 import { useMutation, useQuery } from "convex/react";
-import { BellSimple, BookmarkSimple, UploadSimple } from "phosphor-react-native";
+import {
+  BellSimple,
+  BookmarkSimple,
+  UploadSimple,
+} from "phosphor-react-native";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
@@ -11,6 +15,7 @@ import { Segmented } from "@/components/segmented";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CATEGORY_LABELS, type CategoryId } from "@/constants/categories";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { router } from "expo-router";
 
 const TABS = [
   { id: "saved", label: "Sauvegardés" },
@@ -33,12 +38,15 @@ export default function LibraryScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <AppHeader title="Bibliothèque" />
+      <AppHeader
+        title="Bibliothèque"
+        action={{ label: "+ Publier", onPress: () => router.push("/submit") }}
+      />
       <Segmented options={TABS} value={tab} onChange={setTab} />
 
       {tab === "saved" ? (
         <ResourceList
-          data={saved}
+          data={saved as any}
           emptyIcon={
             <BookmarkSimple size={48} color={mutedForeground} weight="thin" />
           }
